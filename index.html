@@ -1076,6 +1076,10 @@
     body.classList.toggle('edit-on', editing);
     toggle.classList.toggle('active', editing);
     toggle.lastChild.textContent = editing ? 'Edit mode' : 'View mode';
+    document.querySelectorAll('[contenteditable]').forEach(el => {
+      el.setAttribute('contenteditable', editing ? 'true' : 'false');
+      el.blur();
+    });
   }
   toggle.addEventListener('click', () => setEditing(!editing));
   setEditing(true);
