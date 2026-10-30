@@ -4,20 +4,49 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script>
+(function(){
+  var t = null;
+  try{ t = localStorage.getItem('theme'); }catch(e){}
+  if(t !== 'light' && t !== 'dark'){
+    t = (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) ? 'dark' : 'light';
+  }
+  document.documentElement.setAttribute('data-theme', t);
+})();
+</script>
 <title>Gluten-Free Baking — Recipe Collection</title>
 <link href="https://fonts.googleapis.com" rel="preconnect"/>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,500;9..144,600;9..144,700&amp;family=Inter:wght@400;500;600;700&amp;family=Space+Mono:wght@400;700&amp;display=swap" rel="stylesheet"/>
 <style>
   :root{
+    color-scheme:light;
     --ink:#12151b;
     --charcoal:#f3f5f8;
     --slate:#eceff4;
     --line:#d7dce3;
     --fog:#6b7280;
     --paper:#ffffff;
+    --body:#374151;
     --blue:#3f6fb0;
     --blue-dim:#b9cde6;
     --blue-bright:#2f5c9c;
+    --btn-bg:#12151b;
+    --btn-text:#ffffff;
+  }
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --ink:#e8ecf3;
+    --charcoal:#171b23;
+    --slate:#1d222b;
+    --line:#2b323e;
+    --fog:#9aa3b2;
+    --paper:#0e1117;
+    --body:#c3cad6;
+    --blue:#5b8dd6;
+    --blue-dim:#34527e;
+    --blue-bright:#8ab4f0;
+    --btn-bg:#e8ecf3;
+    --btn-text:#12151b;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
@@ -48,14 +77,14 @@
 
   .toolbar{
     position:fixed;
-    top:20px; right:20px;
+    top:20px; left:20px;
     z-index:100;
     display:flex; align-items:center; gap:8px;
   }
   .edit-toggle{
     display:flex; align-items:center; gap:9px;
-    background:var(--ink);
-    color:#fff;
+    background:var(--btn-bg);
+    color:var(--btn-text);
     border:none;
     border-radius:30px;
     padding:10px 18px 10px 14px;
@@ -78,7 +107,7 @@
 
   .edit-hint{
     position:fixed;
-    top:66px; right:20px;
+    top:66px; left:20px;
     z-index:99;
     max-width:230px;
     background:var(--paper);
@@ -92,13 +121,47 @@
   }
   .edit-on .edit-hint{display:block;}
 
+  /* THEME TOGGLE (top-right; edit mode lives top-left) */
+  .theme-toggle{
+    position:fixed;
+    top:20px; right:20px;
+    z-index:100;
+    display:flex; align-items:center; gap:9px;
+    background:var(--btn-bg);
+    color:var(--btn-text);
+    border:none;
+    border-radius:30px;
+    padding:10px 16px;
+    font-family:'Space Mono', monospace;
+    font-size:12px;
+    letter-spacing:0.05em;
+    text-transform:uppercase;
+    cursor:pointer;
+    box-shadow:0 6px 18px rgba(0,0,0,0.18);
+    transition:transform 0.15s;
+  }
+  .theme-toggle:hover{transform:translateY(-1px);}
+  .theme-toggle:focus-visible{outline:2px solid var(--blue); outline-offset:3px;}
+  .theme-toggle svg{width:15px; height:15px;}
+  .theme-toggle .icon-sun{display:none;}
+  :root[data-theme="dark"] .theme-toggle .icon-sun{display:block;}
+  :root[data-theme="dark"] .theme-toggle .icon-moon{display:none;}
+  .edit-hint{pointer-events:none;}
+  .hint-dismissed .edit-hint{display:none;}
+  @media (max-width:600px){
+    .theme-toggle{top:20px; right:12px; padding:10px; box-shadow:0 4px 12px rgba(0,0,0,0.18);}
+    .theme-toggle .theme-label{display:none;}
+    .toolbar{left:12px;}
+    .edit-hint{left:12px;}
+  }
+
   /* HERO */
   .hero{
     position:relative;
     padding:100px 24px 48px;
     background:
       radial-gradient(ellipse 900px 500px at 50% -10%, rgba(63,111,176,0.08), transparent 60%),
-      linear-gradient(180deg, #ffffff 0%, var(--charcoal) 100%);
+      linear-gradient(180deg, var(--paper) 0%, var(--charcoal) 100%);
     border-bottom:1px solid var(--line);
     overflow:hidden;
   }
@@ -145,8 +208,8 @@
   }
   .jump-btn{
     display:inline-flex; align-items:center; gap:10px;
-    background:var(--ink);
-    color:#fff;
+    background:var(--btn-bg);
+    color:var(--btn-text);
     border:none;
     border-radius:30px;
     padding:13px 26px;
@@ -172,7 +235,7 @@
   }
   .modal-overlay.open{display:flex;}
   .modal-box{
-    background:#fff;
+    background:var(--paper);
     border-radius:16px;
     max-width:440px;
     width:100%;
@@ -203,7 +266,7 @@
     padding:14px 16px;
     cursor:pointer;
     text-align:left;
-    background:#fff;
+    background:var(--paper);
     transition:border-color 0.15s, background 0.15s;
   }
   .modal-item:hover{border-color:var(--blue); background:rgba(63,111,176,0.05);}
@@ -287,7 +350,7 @@
     border:1px solid var(--line);
     border-radius:12px;
     overflow:hidden;
-    background:#ffffff;
+    background:var(--paper);
     max-width:760px; margin:28px auto 0;
   }
   .meta-item{
@@ -342,7 +405,7 @@
     border-radius:8px;
     padding:16px 20px;
     font-size:14.5px;
-    color:#374151;
+    color:var(--body);
     margin-bottom:32px;
   }
   .note-callout strong{color:var(--blue-bright); font-weight:600;}
@@ -432,7 +495,7 @@
     line-height:1;
   }
   .step:hover .step-num{color:var(--blue-bright);}
-  .step-body p{color:#374151; font-size:15px;}
+  .step-body p{color:var(--body); font-size:15px;}
   .step-timer{
     display:inline-flex; align-items:center; gap:6px;
     margin-top:10px;
@@ -480,7 +543,7 @@
   .gallery-head p{color:var(--fog); font-size:13.5px; max-width:400px;}
   .upload-btn{
     display:inline-flex; align-items:center; gap:8px;
-    background:var(--ink); color:#fff;
+    background:var(--btn-bg); color:var(--btn-text);
     border:none; border-radius:24px;
     padding:10px 18px;
     font-family:'Inter', sans-serif;
@@ -570,6 +633,11 @@
 <button class="edit-toggle" id="editToggle"><span class="dot"></span>Edit mode</button>
 </div>
 <div class="edit-hint">Edit mode is on — click any text to change it, or upload photos below each recipe. Everything you change or add is saved automatically in this browser.</div>
+<button aria-label="Switch to dark mode" aria-pressed="false" class="theme-toggle" id="themeToggle" type="button">
+<svg class="icon-moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1111.2 3a7 7 0 009.8 9.8z"></path></svg>
+<svg class="icon-sun" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path></svg>
+<span class="theme-label">Dark mode</span>
+</button>
 <!-- HERO -->
 <div class="hero">
 <div class="hero-inner">
@@ -1083,6 +1151,31 @@
   }
   toggle.addEventListener('click', () => setEditing(!editing));
   setEditing(true);
+
+  // The edit tip fades away after a few seconds so it never sits on top of the title
+  let hintTimer;
+  function showHint(){
+    body.classList.remove('hint-dismissed');
+    clearTimeout(hintTimer);
+    hintTimer = setTimeout(() => body.classList.add('hint-dismissed'), 6000);
+  }
+  showHint();
+  toggle.addEventListener('click', () => { if(editing) showHint(); });
+
+  // Light / dark theme toggle (the starting theme is set in <head> before paint)
+  const themeBtn = document.getElementById('themeToggle');
+  function applyTheme(t){
+    document.documentElement.setAttribute('data-theme', t);
+    themeBtn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
+    themeBtn.setAttribute('aria-label', t === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+    themeBtn.querySelector('.theme-label').textContent = t === 'dark' ? 'Light mode' : 'Dark mode';
+  }
+  applyTheme(document.documentElement.getAttribute('data-theme') || 'light');
+  themeBtn.addEventListener('click', () => {
+    const next = document.documentElement.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+    try{ localStorage.setItem('theme', next); }catch(err){ /* storage blocked, still works for this visit */ }
+  });
 
   // Storage: use Claude's artifact storage while working here, but fall
   // back to the browser's own localStorage once this page is hosted for
